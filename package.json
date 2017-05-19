@@ -1,0 +1,24 @@
+{
+  "name": "dieroller",
+  "version": "0.0.1",
+  "description": "A die roller for Chronicles of Darkness",
+  "main": "dieBotClient.js",
+  "dependencies": {
+    "discord.js": "^11.1.0",
+    "mongodb": "^2.2.26"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@bitbucket.org/CuAnnan/discordcodbot.git"
+  },
+  "keywords": [
+    "CoD"
+  ],
+  "author": "Wing",
+  "license": "BSD-2-Clause",
+  "homepage": "https://bitbucket.org/CuAnnan/discordcodbot#readme"
+}
