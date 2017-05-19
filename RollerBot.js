@@ -1,7 +1,8 @@
 let DiceRoller = require ('./DiceRollActions.js'),
 	Logger = require('./DiceLogger.js'),
 	conf = require('./conf.js'),
-	guilds = {};
+	guilds = {},
+	prefix = conf.commandPrefix;
 
 function processRoteAdvanced (commandParts)
 {
@@ -161,8 +162,6 @@ function getSTList(message)
 	return guilds[message.guild.id].storytellers;
 }
 
-let prefix = '!';
-
 /**
  * Help text stuff
  */
@@ -175,10 +174,8 @@ let commands = {
 	'examples':'See some example rolls',
 	'samples':'Alias for "examples"',
 	'help':'This text'
-};
-let helpText =
-	'Commands:';
-let longest = '';
+}, helpText = 'Commands:',
+	longest = '';
 for(let i in commands)
 {
 	longest = longest.length > i.length ? longest : i;
