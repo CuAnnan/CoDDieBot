@@ -1,6 +1,6 @@
 {
   "name": "dieroller",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "A die roller for Chronicles of Darkness",
   "main": "dieBotClient.js",
   "dependencies": {

@@ -107,14 +107,17 @@ function sendArrayMessage(results, message)
 			{
 				x.send(messageFragment);
 				let stList = getSTList(message);
-				for (var i in stList)
+				for (let i in stList)
 				{
 					if (user.id !== i)
 					{
 						stList[i].createDM().then(
 							function (y)
 							{
-								y.send(user.username + ' rolled ' + messageFragment);
+								let stMessageFragment = messageFragment.slice(0);
+								stMessageFragment.unshift(user.username+' rolled:');
+								y.send(stMessageFragment);
+								
 							}
 						);
 					}
@@ -128,8 +131,7 @@ function sendArrayMessage(results, message)
 function displayResults(action, message)
 {
 	let results = action.getResults(),
-		user = message.author,
-		concattedMessages = [results];
+		user = message.author;
 	if(results.constructor === Array)
 	{
 		sendArrayMessage(results, message);
@@ -141,7 +143,7 @@ function displayResults(action, message)
 		{
 			x.send(results);
 			let stList = getSTList(message);
-			for (var i in stList)
+			for (let i in stList)
 			{
 				if (user.id !== i)
 				{
@@ -217,7 +219,7 @@ rollerBot.simple = rollerBot.s = rollerBot.roll = function(commandParts, message
 	{
 		data.sitMods = parseInt(commandParts[2]);
 	}
-	let action;
+	
 	if(data.advanced)
 	{
 		roll = new DiceRoller.AdvancedAction(data);
@@ -240,6 +242,7 @@ rollerBot.extended = rollerBot.ex = function(commandParts, message, comment)
 	{
 		data.sitMods = parseInt(commandParts[2]);
 	}
+	
 	let action = new DiceRoller.ExtendedAction(data);
 	displayResults(action, message);
 };
