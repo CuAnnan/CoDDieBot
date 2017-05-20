@@ -241,6 +241,10 @@ rollerBot.extended = rollerBot.ex = function(commandParts, message, comment)
 	if(commandParts.length > 2)
 	{
 		data.sitMods = parseInt(commandParts[2]);
+		if(commandParts.length > 3)
+		{
+			data.successThreshold = parseInt(commandParts[3]);
+		}
 	}
 	
 	let action = new DiceRoller.ExtendedAction(data);
