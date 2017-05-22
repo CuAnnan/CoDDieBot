@@ -338,8 +338,8 @@ rollerBot.process = function(message)
 	if(commandsToIgnore.indexOf(command) < 0 && this[command])
 	{
 		this[command](commandParts, message, comment);
+		message.delete();
 	}
-	message.delete();
 };
 
 /**
