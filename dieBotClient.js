@@ -9,7 +9,7 @@ client.on(
 	function()
 	{
 		console.log("Logged in as "+client.user.username+"!");
-		bot.registerSTList(client);
+		bot.registerGuildList(client);
 	}
 );
 

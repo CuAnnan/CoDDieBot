@@ -195,16 +195,29 @@ for(let i in commands)
 
 let rollerBot = {};
 
-rollerBot.help = function(commandParts, message)
+rollerBot.startGame = function()
 {
-	let user = message.author;
-	
-	user.createDM().then(
-		function(x)
-		{
-			x.send(helpText);
-		}
-	);
+
+};
+
+rollerBot.register = function()
+{
+
+};
+
+rollerBot.endGame = function()
+{
+
+}
+
+rollerBot.recommend = rollerBot.rec = function(commandParts, message)
+{
+
+};
+
+rollerBot.request = rollerBot.req = function(commandParts, message)
+{
+
 };
 
 rollerBot.simple = rollerBot.s = rollerBot.roll = function(commandParts, message, comment)
@@ -251,6 +264,20 @@ rollerBot.extended = rollerBot.ex = function(commandParts, message, comment)
 	displayResults(action, message);
 };
 
+// Help functions
+
+rollerBot.help = function(commandParts, message)
+{
+	let user = message.author;
+	
+	user.createDM().then(
+		function(x)
+		{
+			x.send(helpText);
+		}
+	);
+};
+
 rollerBot.examples = rollerBot.samples = rollerBot.sample = rollerBot.example = function(commandParts, message)
 {
 	message.author.createDM().then(
@@ -287,11 +314,10 @@ rollerBot.examples = rollerBot.samples = rollerBot.sample = rollerBot.example = 
 	);
 };
 
-rollerBot.register = function(commandParts, message)
-{
-	console.log(message);
-};
-
+/**
+ * This method binds a the prefixed command to an instance method of the rollerBot assuming such a method exists.
+ * @param message
+ */
 rollerBot.process = function(message)
 {
 	if(!message.content.startsWith(prefix))
@@ -313,9 +339,16 @@ rollerBot.process = function(message)
 	{
 		this[command](commandParts, message, comment);
 	}
+	message.delete();
 };
 
-rollerBot.registerSTList = function(client)
+/**
+ * Looks through all of the guilds the client is registered to
+ * Binds all of the STs on those guilds to an array for the guilds.
+ * Also creates an object in each to store any Beat Recommendations or Requests
+ * This allows DMing the STs the results of any roll.
+ */
+rollerBot.registerGuildList = function(client)
 {
 	client.guilds.map(
 		x=>{
