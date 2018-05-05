@@ -308,6 +308,11 @@ class CoDDiceBot extends DiscordBot
 					'\t*'+prefix+'extended 7 2* would roll 9 dice, 7 times, and require 10 successes',
 					'\t*'+prefix+'extended 7 2 20* would roll 9 dice, 7 times and require 20 successes',
 					'\t*'+prefix+'extended 7 0 20* would roll 7 dice, 7 times and require 20 successes',
+					'',
+					'Admin Actions',
+					'\t*'+prefix+'setCommandPrefix Specify a new command prefix',
+					'\t*'+prefix+'setSTRole Specify a role other than the default Story-Teller for storyteller rolls',
+					'The bot also responds to mentions in case mistakes are made. Admin actions can only be performed by the server owner.'
 				]);
 			}
 		);
