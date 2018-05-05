@@ -1,11 +1,10 @@
 {
-  "name": "dieroller",
-  "version": "0.0.3",
-  "description": "A die roller for Chronicles of Darkness",
-  "main": "dieBotClient.js",
+  "name": "coddiebot",
+  "version": "1.0.0",
+  "description": "A node powered dice rolling bot for discord for playing Chronicles of Darkness games",
+  "main": "app.js",
   "dependencies": {
-    "discord.js": "^11.3.2",
-    "mongodb": "^2.2.35"
+    "discord.js": "^11.3.2"
   },
   "devDependencies": {},
   "scripts": {
@@ -13,12 +12,16 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@bitbucket.org/CuAnnan/discordcodbot.git"
+    "url": "git+https://github.com/CuAnnan/CoDDieBot.git"
   },
   "keywords": [
+    "Dice",
     "CoD"
   ],
   "author": "Wing",
-  "license": "BSD-2-Clause",
-  "homepage": "https://bitbucket.org/CuAnnan/discordcodbot#readme"
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/CuAnnan/CoDDieBot/issues"
+  },
+  "homepage": "https://github.com/CuAnnan/CoDDieBot#readme"
 }
