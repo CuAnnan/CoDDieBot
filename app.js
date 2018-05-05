@@ -45,7 +45,9 @@ process.on(
 	'SIGINT',
 	function()
 	{
-		console.log('Shutting down bot');
+		console.log('Shutting down bot')
+		bot.shutdown();
+		console.log('Shutting down client');
 		client.destroy();
 		console.log('Shutting down app');
 		process.exit();

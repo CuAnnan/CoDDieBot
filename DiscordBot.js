@@ -1,5 +1,6 @@
 "use strict";
-let conf = require('./conf.js');
+let conf = require('./conf.js'),
+	fs = require('fs');
 
 class DiscordBot
 {
@@ -15,6 +16,11 @@ class DiscordBot
 		this.user = user;
 	}
 	
+	shutdown()
+	{
+		this.saveSettings();
+	}
+	
 	attachCommand(command, callback, rescope = true)
 	{
 		if(rescope)
@@ -25,6 +31,11 @@ class DiscordBot
 		this.commands[command.toLowerCase()] = callback;
 	}
 	
+	attachCommands()
+	{
+		this.attachCommand('setCommandPrefix', this.setCommandPrefixForGuild);
+	}
+	
 	getCommandPrefixForGuild(guildId)
 	{
 		if(this.commandPrefixOverrides[guildId])
@@ -32,6 +43,49 @@ class DiscordBot
 			return this.commandPrefixOverrides[guildId];
 		}
 		return this.commandPrefix;
+	}
+	
+	setCommandPrefixForGuild(commandParts, message, comment)
+	{
+		if (!commandParts.length)
+		{
+			return;
+		}
+		let guildSpecificPrefix = commandParts[0].trim();
+		if (guildSpecificPrefix.length > 1)
+		{
+			return;
+		}
+		if (guildSpecificPrefix === conf.commandPrefix)
+		{
+			delete this.commandPrefixOverrides[message.guild.id];
+		}
+		else
+		{
+			this.commandPrefixOverrides[message.guild.id] = guildSpecificPrefix;
+		}
+	}
+	
+	getSettingsToSave()
+	{
+		let settingsToSave = {
+				'commandPrefixOverrides': this.commandPrefixOverrides
+			};
+		return settingsToSave;
+	}
+	
+	saveSettings()
+	{
+		let settings = this.getSettingsToSave();
+		console.log('Trying to write file');
+		fs.writeFileSync('./settings.json', JSON.stringify(settings),(err)=>{
+			if(err)
+			{
+				return console.warn(err);
+			}
+			console.log('The file was saved');
+		});
+		
 	}
 	
 	addCommandAlias(commandAlias, command)

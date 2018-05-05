@@ -1,13 +1,13 @@
 let DiscordBot = require('./DiscordBot'),
 	{SimpleAction, AdvancedAction, ExtendedAction} = require('./DiceRoller'),
-	conf = ('./conf.js');
+	conf = require('./conf');
 
 class CoDDiceBot extends DiscordBot
 {
 	constructor()
 	{
 		super();
-		this.stRoleList = {};
+		this.stRoleOverrides = {};
 	}
 	
 	processRoteAdvanced(commandParts)
@@ -87,9 +87,23 @@ class CoDDiceBot extends DiscordBot
 		return Object.assign({}, tricks, critAndExplode);
 	}
 	
+	getSTRoleNameForGuild(guildId)
+	{
+		if(this.stRoleOverrides[guildId])
+		{
+			return this.stRoleOverrides;
+		}
+		return conf.stRoleName;
+	}
+	
+	setSTRoleNameForGuild(commandParts, message)
+	{
+	
+	}
+	
 	getSTList(message)
 	{
-		let role = message.guild.roles.find('name', 'Story-Tellers');
+		let role = message.guild.roles.find('name', conf.stRoleName);
 		
 		if(role)
 		{
@@ -227,6 +241,7 @@ class CoDDiceBot extends DiscordBot
 	
 	attachCommands()
 	{
+		super.attachCommands();
 		this.attachCommand('help', this.displayHelpText);
 		this.attachCommand('roll', this.simpleRoll);
 		this.attachCommand('extended', this.extendedRoll);
