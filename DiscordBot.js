@@ -14,6 +14,10 @@ class DiscordBot
 	hoist(user)
 	{
 		this.user = user;
+		let settingsText = fs.readFileSync('./settings.json');
+		let settings = JSON.parse(settingsText);
+		this.commandPrefixOverrides = settings.commandPrefixOverrides;
+		return settings;
 	}
 	
 	shutdown()
@@ -146,16 +150,18 @@ class DiscordBot
 			try
 			{
 				this.commands[command](commandParts, message, comment);
-				try
-				{
-					message.delete();
-				}
-				catch (e)
-				{
-					console.log(e);
-				}
 			}
 			catch(e)
+			{
+				message.reply('This is only allowable by the server owner');
+				console.log(e);
+			}
+			
+			try
+			{
+				message.delete();
+			}
+			catch (e)
 			{
 				console.log(e);
 			}

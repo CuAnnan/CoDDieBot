@@ -10,6 +10,12 @@ class CoDDiceBot extends DiscordBot
 		this.stRoleOverrides = {};
 	}
 	
+	hoist()
+	{
+		let settings = super.hoist();
+		this.stRoleOverrides = settings.stRoleOverrides;
+	}
+	
 	processRoteAdvanced(commandParts)
 	{
 		let result = {
