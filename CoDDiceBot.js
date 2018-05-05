@@ -98,12 +98,35 @@ class CoDDiceBot extends DiscordBot
 	
 	setSTRoleNameForGuild(commandParts, message)
 	{
+		if (!commandParts.length)
+		{
+			return;
+		}
+		let stRole = commandParts[0].trim();
+		if (stRole.length > 1)
+		{
+			return;
+		}
+		if (stRole === conf.stRoleName)
+		{
+			delete this.stRoleOverrides[message.guild.id];
+		}
+		else
+		{
+			this.stRoleOverrides[message.guild.id] = stRole;
+		}
+	}
 	
+	getSettingsToSave()
+	{
+		let settingsToSave = super.getSettingsToSave();
+		settingsToSave.stRoleOverrides = this.stRoleOverrides;
+		return settingsToSave;
 	}
 	
 	getSTList(message)
 	{
-		let role = message.guild.roles.find('name', conf.stRoleName);
+		let role = message.guild.roles.find('name', this.getSTRoleNameForGuild(message.guild.id));
 		
 		if(role)
 		{
