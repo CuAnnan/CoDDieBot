@@ -98,6 +98,7 @@ class CoDDiceBot extends DiscordBot
 	
 	setSTRoleNameForGuild(commandParts, message)
 	{
+		this.elevateCommand(message);
 		if (!commandParts.length)
 		{
 			return;
@@ -268,6 +269,7 @@ class CoDDiceBot extends DiscordBot
 		this.attachCommand('help', this.displayHelpText);
 		this.attachCommand('roll', this.simpleRoll);
 		this.attachCommand('extended', this.extendedRoll);
+		this.attachCommand('setSTRole', this.setSTRoleNameForGuild);
 	}
 	
 	displayHelpText(commandParts, message)

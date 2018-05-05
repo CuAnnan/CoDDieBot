@@ -21,6 +21,14 @@ class DiscordBot
 		this.saveSettings();
 	}
 	
+	elevateCommand(message)
+	{
+		if(message.guild.owner.id !== message.author.id)
+		{
+			throw new Error('This action is only allowable by the server owner')
+		}
+	}
+	
 	attachCommand(command, callback, rescope = true)
 	{
 		if(rescope)
@@ -47,10 +55,12 @@ class DiscordBot
 	
 	setCommandPrefixForGuild(commandParts, message, comment)
 	{
+		this.elevateCommand(message);
 		if (!commandParts.length)
 		{
 			return;
 		}
+		
 		let guildSpecificPrefix = commandParts[0].trim();
 		if (guildSpecificPrefix.length > 1)
 		{
@@ -133,8 +143,22 @@ class DiscordBot
 		
 		if (this.commands[command])
 		{
-			this.commands[command](commandParts, message, comment);
-			message.delete();
+			try
+			{
+				this.commands[command](commandParts, message, comment);
+				try
+				{
+					message.delete();
+				}
+				catch (e)
+				{
+					console.log(e);
+				}
+			}
+			catch(e)
+			{
+				console.log(e);
+			}
 		}
 	}
 	
