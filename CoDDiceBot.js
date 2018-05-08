@@ -8,12 +8,22 @@ class CoDDiceBot extends DiscordBot
 	{
 		super();
 		this.stRoleOverrides = {};
+		this.serverOverridePreventDM = {};
+		this.serverOverridesInChannelResponses = {};
+		
 	}
 	
-	hoist()
+	async hoist(user)
 	{
-		let settings = super.hoist();
-		this.stRoleOverrides = settings.stRoleOverrides;
+		let settings = super.hoist(user);
+		let settingsToHoist = ['stRoleOverrides', 'serverOverridePreventDM', 'serverOverridesInChannelResponses'];
+		for(let setting of settingsToHoist)
+		{
+			this[settings] = settings[setting]?settings[setting]:{};
+		}
+		
+		this.attachCommands();
+		return settings;
 	}
 	
 	processRoteAdvanced(commandParts)
@@ -124,10 +134,54 @@ class CoDDiceBot extends DiscordBot
 		}
 	}
 	
+	/**
+	 * this allows the overriding of DM responses on a server wide basis
+	 * if <i>ANYTHING</i> is sent along with the command, be it false or true or fuck my life,
+	 * the serverwide respond by dm will be <b>PREVENTED</b>.
+	 */
+	setServerwideRespondByDM(commandParts, message)
+	{
+		this.elevateCommand(message);
+		
+		if(commandParts[0])
+		{
+			this.serverOverridePreventDM[message.guild.id] = true;
+		}
+		else
+		{
+			delete this.serverOverridePreventDM[message.guild.id];
+		}
+	}
+	
+	/**
+	 * This allows the overriding of in channel responses on a server wide basis
+	 * if there's no command parts or if there is and it's anything but "false" or "FALSE",
+	 * the server wide respond in channel override will be set to true
+	 */
+	setServerwideRespondInChannel(commandParts, message)
+	{
+		this.elevateCommand(message);
+		if(commandParts[0])
+		{
+			if(commandParts[0].toLowerCase() == "false")
+			{
+				delete this.serverOverridesInChannelResponses[message.guild.id];
+				return;
+			}
+		}
+		this.serverOverridesInChannelResponses[message.guild.id] = true;
+	}
+	
 	getSettingsToSave()
 	{
 		let settingsToSave = super.getSettingsToSave();
-		settingsToSave.stRoleOverrides = this.stRoleOverrides;
+		
+		let settingsToHoist = ['stRoleOverrides', 'serverOverridePreventDM', 'serverOverridesInChannelResponses'];
+		for(let setting of settingsToHoist)
+		{
+			settingsToSave[setting] = this[setting];
+		}
+		
 		return settingsToSave;
 	}
 	
@@ -142,83 +196,82 @@ class CoDDiceBot extends DiscordBot
 		return [];
 	}
 	
-	sendMessageArray(messageArray, message, comment)
+	sendDMResults(userMessage, STMessage, message)
 	{
 		let user = message.author,
-			concatenatedMessagePart = [],
-			concatenatedMessage = [],
-			currentMessageLength = 0;
-		
-		for(let i in messageArray)
-		{
-			currentMessageLength += messageArray[i].length;
-			if(currentMessageLength >= 1800)
-			{
-				currentMessageLength = 0;
-				concatenatedMessage.push(concatenatedMessagePart);
-				concatenatedMessagePart = [];
-			}
-			concatenatedMessagePart.push(messageArray[i]);
-		}
-		concatenatedMessage.push(concatenatedMessagePart);
-		
-		for(let i in concatenatedMessage)
-		{
-			let messageFragment = concatenatedMessage[i];
-			
-			user.createDM().then(
-				(x)=>
-				{
-					x.send(messageFragment);
-					
-					
-					let stList = this.getSTList(message);
-					stList.forEach(
-						(st, stId)=>
-						{
-							st.createDM().then(
-								(y)=>{
-									let stMessageFragment = messageFragment.slice(0);
-									stMessageFragment.unshift(user.username+' rolled:');
-									y.send(stMessageFragment);
-									y.send(comment);
-								}
-							);
-						}
-					);
-					
-				}
-			);
-		}
-	}
-	
-	displayResults(action, message, comment)
-	{
-		let results = action.getResults(),
-			user = message.author;
-		if(results.constructor === Array)
-		{
-			this.sendMessageArray(results, message, comment);
-			return;
-		}
+			stList = this.getSTList(message);
 		
 		user.createDM().then(
 			(x)=>
 			{
-				x.send(results);
-				let stList = this.getSTList(message);
+				x.send(userMessage);
+				
 				stList.forEach(
-					(st, stId)=> {
+					(st, stId)=>
+					{
 						st.createDM().then(
 							(y)=>{
-								y.send(user.username + ' rolled ' + results);
-								y.send(comment);
+								y.send(STMessage);
 							}
 						);
 					}
 				);
 			}
 		);
+	}
+	
+	respondInChannel(userMessage, message)
+	{
+		message.reply([message.username,userMessage]);
+	}
+	
+	sendMessageArray(messageArray, message, comment)
+	{
+		let user = message.author,
+			cleanedMessage = this.cleanMessage(messageArray),
+			stList = this.getSTList(message);
+		
+		for(let i in cleanedMessage)
+		{
+			let messageFragment = cleanedMessage[i],
+				stMessageFragment = messageFragment.slice(0);
+			stMessageFragment.unshift(user.username+" "+comment+" Roll:");
+			
+			if(!this.serverOverridePreventDM[message.guild.id])
+			{
+				this.sendDMResults(messageFragment, stMessageFragment, message);
+			}
+			if (this.serverOverridesInChannelResponses[message.guild.id])
+			{
+				
+				this.respondInChannel(messageFragment, message);
+			}
+		}
+	}
+	
+	sendOneLineMessage(results, message, comment)
+	{
+		if (!this.serverOverridePreventDM[message.guild.id])
+		{
+			this.sendDMResults(results, [(message.author.username + " " + comment + " Roll:"), results], message);
+		}
+		if (this.serverOverridesInChannelResponses[message.guild.id])
+		{
+			this.respondInChannel(results, message);
+		}
+	}
+	
+	displayResults(action, message, comment)
+	{
+		let results = action.getResults();
+		
+		if(results.constructor === Array)
+		{
+			this.sendMessageArray(results, message, comment);
+			return;
+		}
+		
+		this.sendOneLineMessage(results, message, comment);
 	}
 	
 	simpleRoll(commandParts, message, comment)
@@ -263,12 +316,6 @@ class CoDDiceBot extends DiscordBot
 		this.displayResults(action, message);
 	}
 	
-	async hoist(user)
-	{
-		super.hoist(user);
-		this.attachCommands();
-	}
-	
 	attachCommands()
 	{
 		super.attachCommands();
@@ -276,6 +323,8 @@ class CoDDiceBot extends DiscordBot
 		this.attachCommand('roll', this.simpleRoll);
 		this.attachCommand('extended', this.extendedRoll);
 		this.attachCommand('setSTRole', this.setSTRoleNameForGuild);
+		this.attachCommand('setServerwideRespondInChannel', this.setServerwideRespondInChannel);
+		this.attachCommand('setServerwideRespondByDM', this.setServerwideRespondByDM);
 	}
 	
 	displayHelpText(commandParts, message)

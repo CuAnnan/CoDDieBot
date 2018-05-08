@@ -9,9 +9,10 @@ class DiscordBot
 		this.commands = {};
 		this.commandPrefix = conf.commandPrefix;
 		this.commandPrefixOverrides = {};
+		
 	}
 	
-	hoist(user)
+	async hoist(user)
 	{
 		this.user = user;
 		let settingsText = fs.readFileSync('./settings.json');
@@ -116,6 +117,8 @@ class DiscordBot
 		let prefix = this.getCommandPrefixForGuild(message.guild.id),
 			atMention = `<@${this.user.id}>`;
 		
+		
+		
 		let isMention = message.content.startsWith(atMention);
 		
 		
@@ -140,11 +143,14 @@ class DiscordBot
 			args = message.content.substring(1).trim().split('--');
 		}
 		
-		
 		let comment = args[1] ? args[1].trim() : '',
 			commandParts = args[0].split(' '),
 			command = commandParts.shift().toLowerCase();
-		
+		this.executeCommand(command, commandParts, message, comment);
+	}
+	
+	executeCommand(command, commandParts, message, comment)
+	{
 		if (this.commands[command])
 		{
 			try
@@ -171,6 +177,27 @@ class DiscordBot
 	sendDM(user, message)
 	{
 		user.createDM().then((x)=>{x.send(message);});
+	}
+	
+	cleanMessage(message)
+	{
+		let concatenatedMessagePart = [],
+			concatenatedMessage = [],
+			currentMessageLength = 0;
+		
+		for(let i in message)
+		{
+			currentMessageLength += message[i].length;
+			if(currentMessageLength >= 1800)
+			{
+				currentMessageLength = 0;
+				concatenatedMessage.push(concatenatedMessagePart);
+				concatenatedMessagePart = [];
+			}
+			concatenatedMessagePart.push(message[i]);
+		}
+		concatenatedMessage.push(concatenatedMessagePart);
+		return concatenatedMessage;
 	}
 }
 
