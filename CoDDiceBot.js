@@ -1,6 +1,7 @@
 let DiscordBot = require('./DiscordBot'),
 	{SimpleAction, AdvancedAction, ExtendedAction} = require('./DiceRoller'),
-	conf = require('./conf');
+	conf = require('./conf'),
+	settingsToHoist = ['stRoleOverrides', 'serverWideOverridePreventDM', 'serverWideOverridesInChannelResponses', 'channelOverrides'];
 
 class CoDDiceBot extends DiscordBot
 {
@@ -8,15 +9,15 @@ class CoDDiceBot extends DiscordBot
 	{
 		super();
 		this.stRoleOverrides = {};
-		this.serverOverridePreventDM = {};
-		this.serverOverridesInChannelResponses = {};
-		
+		this.serverWideOverridePreventDM = {};
+		this.serverWideOverridesInChannelResponses = {};
+		this.channelOverrides = {};
 	}
 	
 	async hoist(user)
 	{
 		let settings = super.hoist(user);
-		let settingsToHoist = ['stRoleOverrides', 'serverOverridePreventDM', 'serverOverridesInChannelResponses'];
+		
 		for(let setting of settingsToHoist)
 		{
 			this[settings] = settings[setting]?settings[setting]:{};
@@ -145,11 +146,11 @@ class CoDDiceBot extends DiscordBot
 		
 		if(commandParts[0])
 		{
-			this.serverOverridePreventDM[message.guild.id] = true;
+			this.serverWideOverridePreventDM[message.guild.id] = true;
 		}
 		else
 		{
-			delete this.serverOverridePreventDM[message.guild.id];
+			delete this.serverWideOverridePreventDM[message.guild.id];
 		}
 	}
 	
@@ -165,18 +166,17 @@ class CoDDiceBot extends DiscordBot
 		{
 			if(commandParts[0].toLowerCase() == "false")
 			{
-				delete this.serverOverridesInChannelResponses[message.guild.id];
+				delete this.serverWideOverridesInChannelResponses[message.guild.id];
 				return;
 			}
 		}
-		this.serverOverridesInChannelResponses[message.guild.id] = true;
+		this.serverWideOverridesInChannelResponses[message.guild.id] = true;
 	}
 	
 	getSettingsToSave()
 	{
 		let settingsToSave = super.getSettingsToSave();
 		
-		let settingsToHoist = ['stRoleOverrides', 'serverOverridePreventDM', 'serverOverridesInChannelResponses'];
 		for(let setting of settingsToHoist)
 		{
 			settingsToSave[setting] = this[setting];
@@ -237,13 +237,16 @@ class CoDDiceBot extends DiscordBot
 				stMessageFragment = messageFragment.slice(0);
 			stMessageFragment.unshift(user.username+" "+comment+" Roll:");
 			
-			if(!this.serverOverridePreventDM[message.guild.id])
+			if(!this.serverWideOverridePreventDM[message.guild.id])
 			{
 				this.sendDMResults(messageFragment, stMessageFragment, message);
 			}
-			if (this.serverOverridesInChannelResponses[message.guild.id])
+			if (this.serverWideOverridesInChannelResponses[message.guild.id])
 			{
-				
+				this.respondInChannel(messageFragment, message);
+			}
+			else if(this.channelOverrides[message.channel.id])
+			{
 				this.respondInChannel(messageFragment, message);
 			}
 		}
@@ -251,11 +254,15 @@ class CoDDiceBot extends DiscordBot
 	
 	sendOneLineMessage(results, message, comment)
 	{
-		if (!this.serverOverridePreventDM[message.guild.id])
+		if (!this.serverWideOverridePreventDM[message.guild.id])
 		{
 			this.sendDMResults(results, [(message.author.username + " " + comment + " Roll:"), results], message);
 		}
-		if (this.serverOverridesInChannelResponses[message.guild.id])
+		if (this.serverWideOverridesInChannelResponses[message.guild.id])
+		{
+			this.respondInChannel(results, message);
+		}
+		else if(this.channelOverrides[message.channel.id])
 		{
 			this.respondInChannel(results, message);
 		}
@@ -316,6 +323,16 @@ class CoDDiceBot extends DiscordBot
 		this.displayResults(action, message);
 	}
 	
+	flagChannelForRolling(commandParts, message, comment)
+	{
+		if(commandParts[0] && (commandParts[0].toLowerCase() === 'false'))
+		{
+			delete this.channelOverrides[message.channel.id];
+			return;
+		}
+		this.channelOverrides[message.channel.id] = true;
+	}
+	
 	attachCommands()
 	{
 		super.attachCommands();
@@ -325,6 +342,7 @@ class CoDDiceBot extends DiscordBot
 		this.attachCommand('setSTRole', this.setSTRoleNameForGuild);
 		this.attachCommand('setServerwideRespondInChannel', this.setServerwideRespondInChannel);
 		this.attachCommand('setServerwideRespondByDM', this.setServerwideRespondByDM);
+		this.attachCommand('allowRollsHere', this.flagChannelForRolling);
 	}
 	
 	displayHelpText(commandParts, message)
