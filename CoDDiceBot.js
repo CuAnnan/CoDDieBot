@@ -136,22 +136,21 @@ class CoDDiceBot extends DiscordBot
 	}
 	
 	/**
-	 * this allows the overriding of DM responses on a server wide basis
-	 * if <i>ANYTHING</i> is sent along with the command, be it false or true or fuck my life,
-	 * the serverwide respond by dm will be <b>PREVENTED</b>.
+	 * This allows the overriding of in channel responses on a server wide basis
+	 * if there's no command parts or if there is and it's anything but "false" or "FALSE",
+	 * the server wide respond in channel override will be set to true
 	 */
 	setServerwideRespondByDM(commandParts, message)
 	{
 		this.elevateCommand(message);
 		
-		if(commandParts[0])
-		{
-			this.serverWideOverridePreventDM[message.guild.id] = true;
-		}
-		else
+		if(commandParts[0] && (commandParts[0].toLowerCase() == "false"))
 		{
 			delete this.serverWideOverridePreventDM[message.guild.id];
+			return;
 		}
+		this.serverWideOverridePreventDM[message.guild.id] = true;
+		return;
 	}
 	
 	/**
@@ -162,13 +161,10 @@ class CoDDiceBot extends DiscordBot
 	setServerwideRespondInChannel(commandParts, message)
 	{
 		this.elevateCommand(message);
-		if(commandParts[0])
+		if(commandParts[0] && (commandParts[0].toLowerCase() == "false"))
 		{
-			if(commandParts[0].toLowerCase() == "false")
-			{
-				delete this.serverWideOverridesInChannelResponses[message.guild.id];
-				return;
-			}
+			delete this.serverWideOverridesInChannelResponses[message.guild.id];
+			return;
 		}
 		this.serverWideOverridesInChannelResponses[message.guild.id] = true;
 	}
@@ -376,10 +372,8 @@ class CoDDiceBot extends DiscordBot
 					'\t*'+prefix+'extended 7 2 20* would roll 9 dice, 7 times and require 20 successes',
 					'\t*'+prefix+'extended 7 0 20* would roll 7 dice, 7 times and require 20 successes',
 					'',
-					'Admin Actions',
-					'\t*'+prefix+'setCommandPrefix Specify a new command prefix',
-					'\t*'+prefix+'setSTRole Specify a role other than the default Story-Teller for storyteller rolls',
-					'The bot also responds to mentions in case mistakes are made. Admin actions can only be performed by the server owner.'
+					'The bot also responds to mentions.',
+					'See the github, page https://github.com/CuAnnan/CoDDieBot, for configuration options'
 				]);
 			}
 		);
