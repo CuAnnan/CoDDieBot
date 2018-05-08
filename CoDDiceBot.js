@@ -144,12 +144,12 @@ class CoDDiceBot extends DiscordBot
 	{
 		this.elevateCommand(message);
 		
-		if(commandParts[0] && (commandParts[0].toLowerCase() == "false"))
+		if(commandParts[0] && (commandParts[0].toLowerCase() == "true"))
 		{
-			delete this.serverWideOverridePreventDM[message.guild.id];
+			this.serverWideOverridePreventDM[message.guild.id] = true;
 			return;
 		}
-		this.serverWideOverridePreventDM[message.guild.id] = true;
+		delete this.serverWideOverridePreventDM[message.guild.id];
 		return;
 	}
 	
