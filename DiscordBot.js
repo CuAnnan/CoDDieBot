@@ -115,14 +115,13 @@ class DiscordBot
 			return;
 		}
 		let prefix = this.getCommandPrefixForGuild(message.guild.id),
-			atMention = `<@${this.user.id}>`;
-		
-		
+			atMention = `<@${this.user.id}>`,
+			renamedAtMention = `<@!${this.user.id}>`;
 		
 		let isMention = message.content.startsWith(atMention);
+		let isRenamedMention = message.content.startsWith(renamedAtMention);
 		
-		
-		if (!(message.content.startsWith(prefix) || isMention))
+		if (!(message.content.startsWith(prefix) || isMention || isRenamedMention))
 		{
 			return;
 		}
@@ -138,14 +137,18 @@ class DiscordBot
 		{
 			args = message.content.replace(atMention, '').trim().split('--');
 		}
+		else if(isRenamedMention)
+		{
+			args = message.content.replace(renamedAtMention, '').trim().split('--');
+		}
 		else
 		{
 			args = message.content.substring(1).trim().split('--');
 		}
-		
 		let comment = args[1] ? args[1].trim() : '',
 			commandParts = args[0].split(' '),
 			command = commandParts.shift().toLowerCase();
+		
 		this.executeCommand(command, commandParts, message, comment);
 	}
 	
