@@ -101,7 +101,6 @@ function sendArrayMessage(results, message)
 	for(let i in concatenatedMessage)
 	{
 		let messageFragment = concatenatedMessage[i];
-		console.log(messageFragment);
 		user.createDM().then(
 			function (x)
 			{
@@ -195,39 +194,15 @@ for(let i in commands)
 
 let rollerBot = {};
 
-rollerBot.startGame = function()
-{
-
-};
-
-rollerBot.register = function()
-{
-
-};
-
-rollerBot.endGame = function()
-{
-
-}
-
-rollerBot.recommend = rollerBot.rec = function(commandParts, message)
-{
-
-};
-
-rollerBot.request = rollerBot.req = function(commandParts, message)
-{
-
-};
-
 rollerBot.simple = rollerBot.s = rollerBot.roll = function(commandParts, message, comment)
 {
 	let data = preProcess(commandParts);
 	if(!commandParts.length)
 	{
-		return;
+		commandParts = [1];
 	}
 	data.pool = parseInt(commandParts[1]);
+	
 	if(commandParts.length == 3)
 	{
 		data.sitMods = parseInt(commandParts[2]);
@@ -247,6 +222,7 @@ rollerBot.simple = rollerBot.s = rollerBot.roll = function(commandParts, message
 rollerBot.extended = rollerBot.ex = function(commandParts, message, comment)
 {
 	let data = preProcess(commandParts);
+	
 	if(commandParts.length > 1)
 	{
 		data.pool = parseInt(commandParts[1]);
@@ -354,14 +330,21 @@ rollerBot.registerGuildList = function(client)
 		x=>{
 			guilds[x.id] = {name:x.name, storytellers:{}};
 			let stRole = x.roles.find('name', conf.storyTellerRoleName);
-			x.members.map(
-				y=>{
-					if(y.roles.has(stRole.id))
-					{
-						guilds[x.id].storytellers[y.id] = y;
+			if(stRole)
+			{
+				x.members.map(
+					y => {
+						if (y.roles.has(stRole.id))
+						{
+							guilds[x.id].storytellers[y.id] = y;
+						}
 					}
-				}
-			);
+				);
+			}
+			else
+			{
+				console.warn('St Role ' + conf.storyTellerRoleName + ' not found for guild ' + guilds[x.id].name);
+			}
 		}
 	);
 };

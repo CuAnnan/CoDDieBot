@@ -1,5 +1,5 @@
 module.exports = {
-	clientToken:'MzExMjYyNTgzNTk4NjEyNDgw.C_J-Kw.iibh1g4sqljBX1A4kkJxce76-aU',
+	clientToken:'NDQyMDk4MzA3MTUwMzgxMDc3.Dc8cyA.gbXcNMH30E-yYffzgFKfJJEq8ug',
 	storyTellerRoleName:'@StoryTellers',
 	commandPrefix:'!'
 }

@@ -25,6 +25,13 @@ client.on(
 	}
 );
 
+client.on(
+	'error',
+	(message)=>{
+		console.log(message);
+	}
+)
+
 console.log('Starting');
 
 process.on(

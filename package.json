@@ -4,8 +4,8 @@
   "description": "A die roller for Chronicles of Darkness",
   "main": "dieBotClient.js",
   "dependencies": {
-    "discord.js": "^11.1.0",
-    "mongodb": "^2.2.26"
+    "discord.js": "^11.3.2",
+    "mongodb": "^2.2.35"
   },
   "devDependencies": {},
   "scripts": {
