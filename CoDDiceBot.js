@@ -16,11 +16,11 @@ class CoDDiceBot extends DiscordBot
 	
 	async hoist(user)
 	{
-		let settings = super.hoist(user);
+		let settings = await super.hoist(user);
 		
 		for(let setting of settingsToHoist)
 		{
-			this[settings] = settings[setting]?settings[setting]:{};
+			this[setting] = settings[setting]?settings[setting]:{};
 		}
 		
 		this.attachCommands();
@@ -230,8 +230,7 @@ class CoDDiceBot extends DiscordBot
 	sendMessageArray(messageArray, message, comment)
 	{
 		let user = message.author,
-			cleanedMessage = this.cleanMessage(messageArray),
-			stList = this.getSTList(message);
+			cleanedMessage = this.cleanMessage(messageArray);
 		
 		for(let i in cleanedMessage)
 		{
@@ -243,13 +242,9 @@ class CoDDiceBot extends DiscordBot
 			{
 				this.sendDMResults(messageFragment, stMessageFragment, message);
 			}
-			if (this.serverWideOverridesInChannelResponses[message.guild.id])
+			if (this.serverWideOverridesInChannelResponses[message.guild.id] || this.channelOverrides[message.channel.id])
 			{
-				this.respondInChannel(messageFragment, message);
-			}
-			else if(this.channelOverrides[message.channel.id])
-			{
-				this.respondInChannel(messageFragment, message);
+				this.respondInChannel(messageFragment.join('\n'), message);
 			}
 		}
 	}
