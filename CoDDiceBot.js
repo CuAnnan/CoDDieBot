@@ -302,16 +302,16 @@ class CoDDiceBot extends DiscordBot
 	extendedRoll(commandParts, message, comment)
 	{
 		let data = this.preProcess(commandParts);
-		if(commandParts.length > 1)
+		if(commandParts.length)
 		{
-			data.pool = parseInt(commandParts[1]);
+			data.pool = parseInt(commandParts[0]);
 		}
-		if(commandParts.length > 2)
+		if(commandParts.length >= 2)
 		{
-			data.sitMods = parseInt(commandParts[2]);
-			if(commandParts.length > 3)
+			data.sitMods = parseInt(commandParts[1]);
+			if(commandParts.length > 2)
 			{
-				data.successThreshold = parseInt(commandParts[3]);
+				data.successThreshold = parseInt(commandParts[2]);
 			}
 		}
 		
