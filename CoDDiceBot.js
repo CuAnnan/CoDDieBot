@@ -183,7 +183,13 @@ class CoDDiceBot extends DiscordBot
 	
 	getSTList(message)
 	{
-		let role = message.guild.roles.find('name', this.getSTRoleNameForGuild(message.guild.id));
+		let stRole = this.getSTRoleNameForGuild(message.guild.id);
+		if(!stRole)
+		{
+			return [];
+		}
+		
+		let role = message.guild.roles.find('name', stRole);
 		
 		if(role)
 		{
