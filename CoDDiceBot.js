@@ -144,7 +144,7 @@ class CoDDiceBot extends DiscordBot
 	{
 		this.elevateCommand(message);
 		
-		if(commandParts[0] && (commandParts[0].toLowerCase() == "true"))
+		if(commandParts[0] && (commandParts[0].toLowerCase() == "false"))
 		{
 			this.serverWideOverridePreventDM[message.guild.id] = true;
 			return;
