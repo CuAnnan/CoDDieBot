@@ -108,7 +108,7 @@ class CoDDiceBot extends DiscordBot
 	{
 		if(this.stRoleOverrides[guildId])
 		{
-			return this.stRoleOverrides;
+			return this.stRoleOverrides[guildId];
 		}
 		return conf.stRoleName;
 	}
@@ -121,7 +121,7 @@ class CoDDiceBot extends DiscordBot
 			return;
 		}
 		let stRole = commandParts[0].trim();
-		if (stRole.length > 1)
+		if (stRole.length < 1)
 		{
 			return;
 		}
@@ -188,9 +188,7 @@ class CoDDiceBot extends DiscordBot
 		{
 			return [];
 		}
-		
 		let role = message.guild.roles.find('name', stRole);
-		
 		if(role)
 		{
 			return role.members;
@@ -211,11 +209,14 @@ class CoDDiceBot extends DiscordBot
 				stList.forEach(
 					(st, stId)=>
 					{
-						st.createDM().then(
-							(y)=>{
-								y.send(STMessage);
-							}
-						);
+						if(st.user != user)
+						{
+							st.createDM().then(
+								(y) => {
+									y.send(STMessage);
+								}
+							);
+						}
 					}
 				);
 			}
