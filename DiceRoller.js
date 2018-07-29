@@ -290,18 +290,18 @@ ExtendedAction.prototype.toJSON = function()
 	return data;
 };
 
-ExtendedAction.prototype.perform = function()
-{
-	if(this.rollsPerformed)
+ExtendedAction.prototype.perform = function() {
+	if (this.rollsPerformed)
 	{
 		return this;
 	}
 	this.rollsPerformed = true;
 	this.totalSuccesses = 0;
-	var RollType = this.advanced?AdvancedAction:SimpleAction;
-	for(var i = 0; i < this.pool; i++)
+	let RollType = this.advanced ? AdvancedAction : SimpleAction,
+		rolls = 0, rolling = true;
+	while (rolling)
 	{
-		var roll = new RollType(this);
+		let roll = new RollType(this);
 		roll.perform();
 		this.totalSuccesses += roll.getSuccesses();
 		if(roll.isExceptional())
@@ -309,6 +309,11 @@ ExtendedAction.prototype.perform = function()
 			this.totalExceptionalSuccesses++;
 		}
 		this.rolls.push(roll);
+		
+		if(rolls >= this.pool || this.totalSuccesses >= this.successThreshold)
+		{
+			rolling = false;
+		}
 	}
 	return this;
 }

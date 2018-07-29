@@ -30,7 +30,7 @@ class DiscordBot
 	{
 		if(message.guild.owner.id !== message.author.id)
 		{
-			throw new Error('This action is only allowable by the server owner')
+			throw new Error('This action is only allowable by the server owner');
 		}
 	}
 	
