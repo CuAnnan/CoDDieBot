@@ -9,16 +9,23 @@ class DiscordBot
 		this.commands = {};
 		this.commandPrefix = conf.commandPrefix;
 		this.commandPrefixOverrides = {};
-		
+		this.deleteMessageOverrides = {};
 	}
 	
 	async hoist(user)
 	{
 		this.user = user;
-		let settingsText = fs.readFileSync('./settings.json');
-		let settings = JSON.parse(settingsText);
-		this.commandPrefixOverrides = settings.commandPrefixOverrides;
+		let settings = this.getJSONFromFile('./settings.json');
+		this.commandPrefixOverrides = settings.commandPrefixOverrides?settings.commandPrefixOverrides:{};
+		this.deleteMessageOverrides = settings.deleteMessageOverrides?settings.deleteMessageOverrides:{};
 		return settings;
+	}
+	
+	getJSONFromFile(path)
+	{
+		let text = fs.readFileSync(path),
+			json = JSON.parse(text);
+		return json;
 	}
 	
 	shutdown()
@@ -47,6 +54,29 @@ class DiscordBot
 	attachCommands()
 	{
 		this.attachCommand('setCommandPrefix', this.setCommandPrefixForGuild);
+		this.attachCommand('setCommandDelete', this.setDeleteMessages);
+	}
+	
+	getDeleteMessageForGuild(guildId)
+	{
+		if(Object.keys(this.deleteMessageOverrides).indexOf(guildId) < 0)
+		{
+			return true;
+		}
+		return this.deleteMessageOverrides[guildId];
+	}
+	
+	setDeleteMessages(commandParts, message, comment)
+	{
+		this.elevateCommand(message);
+		if(!commandParts.length)
+		{
+			return;
+		}
+		let guildSpecificDeleteString = commandParts[0].trim().toLowerCase(),
+			guildSpecificDeleteIndex = ['false', 'f', 'n', 'no'].indexOf(guildSpecificDeleteString),
+			guildSpecificDelete = guildSpecificDeleteIndex < 0;
+		this.deleteMessageOverrides[message.guild.id] = guildSpecificDelete;
 	}
 	
 	getCommandPrefixForGuild(guildId)
@@ -61,6 +91,7 @@ class DiscordBot
 	setCommandPrefixForGuild(commandParts, message, comment)
 	{
 		this.elevateCommand(message);
+		
 		if (!commandParts.length)
 		{
 			return;
@@ -79,12 +110,14 @@ class DiscordBot
 		{
 			this.commandPrefixOverrides[message.guild.id] = guildSpecificPrefix;
 		}
+		this.saveSettings();
 	}
 	
 	getSettingsToSave()
 	{
 		let settingsToSave = {
-				'commandPrefixOverrides': this.commandPrefixOverrides
+				'commandPrefixOverrides': this.commandPrefixOverrides,
+				'deleteMessages':this.deleteMessageOverrides,
 			};
 		return settingsToSave;
 	}
@@ -92,7 +125,7 @@ class DiscordBot
 	saveSettings()
 	{
 		let settings = this.getSettingsToSave();
-		console.log('Trying to write file');
+		
 		fs.writeFileSync('./settings.json', JSON.stringify(settings),(err)=>{
 			if(err)
 			{
@@ -125,6 +158,7 @@ class DiscordBot
 		{
 			return;
 		}
+		
 		
 		if (message.channel.type == 'dm')
 		{
@@ -166,13 +200,11 @@ class DiscordBot
 				console.log(e);
 			}
 			
-			try
+			if(this.getDeleteMessageForGuild(message.guild.id))
 			{
-				message.delete();
-			}
-			catch (e)
-			{
-				console.log(e);
+				message.delete().catch(() => {
+					console.log('Bot is not permitted to delete on this guild');
+				});
 			}
 		}
 	}
