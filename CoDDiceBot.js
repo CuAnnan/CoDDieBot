@@ -357,7 +357,7 @@ class CoDDiceBot extends DiscordBot
 					prefix+'roll [r a {explodeOn}+ {exceptionalOn}!] {pool} {sitmods} -- A description of the roll\n',
 					'\t*'+prefix+'roll 7* would roll 7 dice',
 					'\t*'+prefix+'roll 7 2* would roll 9 dice, treating two of them as a bonus',
-					'\t*'+prefix+'roll 7 -2* would roll 5 dice, treating two of them as a penalty',
+					'\t*'+prefix+'roll 7 -2* would roll 5 dice, treating the minus two as a penalty',
 					'\t*'+prefix+'roll 9+ 5* would roll 5 dice, rerolling all 9s and 10s',
 					'\t*'+prefix+'roll 3! 6* would roll 6 dice, and would count 3 or more successes as exceptional',
 					'\t*'+prefix+'roll 8+ 4! 9* would roll 9 dice, rerolling on 8s, 9s or 10s and count 4 or more successes as exceptional',
