@@ -26,7 +26,7 @@ function listen()
 }
 
 client.login(conf.clientToken);
-client.on(
+client.once(
 	'ready',
 	function()
 	{
