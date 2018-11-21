@@ -81,6 +81,11 @@ class CoDDiceBot extends DiscordBot
 				result.explodesOn = parseInt(commandPart.substr(0, commandPart.length - 1));
 				indicesToSplice.unshift(i);
 			}
+			else if(commandPart.endsWith('-again'))
+			{
+				result.explodesOn = parseInt(commandPart.split('-')[0]);
+				indicesToSplice.unshift(i);
+			}
 			else if(commandPart.endsWith('!'))
 			{
 				result.exceptionalThreshold = parseInt(commandPart.substr(0, commandPart.length - 1));
@@ -354,7 +359,7 @@ class CoDDiceBot extends DiscordBot
 					'',
 					'Simple actions:',
 					'Command format:',
-					prefix+'roll [r a {explodeOn}+ {exceptionalOn}!] {pool} {sitmods} -- A description of the roll\n',
+					prefix+'roll [r a {explodeOn}+|{explodeOn}-again {exceptionalOn}!] {pool} {sitmods} -- A description of the roll\n',
 					'\t*'+prefix+'roll 7* would roll 7 dice',
 					'\t*'+prefix+'roll 7 2* would roll 9 dice, treating two of them as a bonus',
 					'\t*'+prefix+'roll 7 -2* would roll 5 dice, treating the minus two as a penalty',
