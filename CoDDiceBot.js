@@ -65,42 +65,31 @@ class CoDDiceBot extends DiscordBot
 		return result;
 	}
 	
-	processCritExplode(commandParts)
+	processCritExplode(message)
 	{
-		let result = {
+		let data = {
 				explodesOn:10,
 				exceptionalThreshold:5
 			},
-			indicesToSplice = [];
-		
-		for(let i in commandParts)
+			explode = message.content.match(/(\d+)-a/),
+			exceptional = message.content.match(/(\d)-e/);
+		if(explode && explode.length >= 1)
 		{
-			let commandPart = commandParts[i];
-			if(commandPart.endsWith('+'))
-			{
-				result.explodesOn = parseInt(commandPart.substr(0, commandPart.length - 1));
-				indicesToSplice.unshift(i);
-			}
-			else if(commandPart.endsWith('!'))
-			{
-				result.exceptionalThreshold = parseInt(commandPart.substr(0, commandPart.length - 1));
-				indicesToSplice.unshift(i);
-			}
+			data.explodeOn = explode[1];
+		};
+		if(exceptional && exceptional.length >= 1)
+		{
+			data.exceptionalThreshold = exceptional[1];
 		}
 		
-		for(let i = 0; i < indicesToSplice.length; i++)
-		{
-			commandParts.splice(indicesToSplice[i], 1);
-		}
-		
-		return result;
+		return data;
 	}
 	
-	preProcess(commandParts)
+	preProcess(commandParts, message)
 	{
 		let tricks = this.processRoteAdvanced(commandParts),
-			critAndExplode = this.processCritExplode(commandParts);
-		
+			critAndExplode = this.processCritExplode(message);
+
 		return Object.assign({}, tricks, critAndExplode);
 	}
 	
@@ -281,7 +270,7 @@ class CoDDiceBot extends DiscordBot
 	
 	simpleRoll(commandParts, message, comment)
 	{
-		let data = this.preProcess(commandParts),
+		let data = this.preProcess(commandParts, message),
 			roll;
 		
 		data.pool = parseInt(commandParts[0]);
@@ -303,7 +292,7 @@ class CoDDiceBot extends DiscordBot
 	
 	extendedRoll(commandParts, message, comment)
 	{
-		let data = this.preProcess(commandParts);
+		let data = this.preProcess(commandParts, message);
 		if(commandParts.length)
 		{
 			data.pool = parseInt(commandParts[0]);
@@ -354,13 +343,13 @@ class CoDDiceBot extends DiscordBot
 					'',
 					'Simple actions:',
 					'Command format:',
-					prefix+'roll [r a {explodeOn}+ {exceptionalOn}!] {pool} {sitmods} -- A description of the roll\n',
+					prefix+'roll [r a {8|9|10}-again {exceptionalOn}!] {pool} {sitmods} -- A description of the roll\n',
 					'\t*'+prefix+'roll 7* would roll 7 dice',
 					'\t*'+prefix+'roll 7 2* would roll 9 dice, treating two of them as a bonus',
 					'\t*'+prefix+'roll 7 -2* would roll 5 dice, treating the minus two as a penalty',
-					'\t*'+prefix+'roll 9+ 5* would roll 5 dice, rerolling all 9s and 10s',
-					'\t*'+prefix+'roll 3! 6* would roll 6 dice, and would count 3 or more successes as exceptional',
-					'\t*'+prefix+'roll 8+ 4! 9* would roll 9 dice, rerolling on 8s, 9s or 10s and count 4 or more successes as exceptional',
+					'\t*'+prefix+'roll 9-again 5* would roll 5 dice, rerolling all 9s and 10s',
+					'\t*'+prefix+'roll 3-exceptional 6* would roll 6 dice, and would count 3 or more successes as exceptional',
+					'\t*'+prefix+'roll 8-again 4-exceptional 9* would roll 9 dice, rerolling on 8s, 9s or 10s and count 4 or more successes as exceptional',
 					'\t*'+prefix+'roll r 6* would roll 6 dice, with the rote action',
 					'\t*'+prefix+'roll a 8* would roll 8 dice, with the advanced action',
 					'',
