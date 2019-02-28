@@ -27,41 +27,25 @@ class CoDDiceBot extends DiscordBot
 		return settings;
 	}
 	
-	processRoteAdvanced(commandParts)
+	processRoteAdvanced(message)
 	{
-		let result = {
+	    let result = {
 				rote:false,
 				advanced:false
 			},
 			// these are the four ways we can match the two tricks
-			roteIndex = commandParts.indexOf('r'),
-			advancedIndex = commandParts.indexOf('a'),
-			advancedRoteIndex = commandParts.indexOf('ra'),
-			roteAdvancedIndex = commandParts.indexOf('ar');
-		
-		if(advancedRoteIndex >= 0)
-		{
-			commandParts.splice(advancedRoteIndex, 1);
-			result.rote = true;
-			result.advanced = true;
-		}
-		else if(roteAdvancedIndex >= 0)
-		{
-			commandParts.splice(roteAdvancedIndex, 1);
-			result.rote = true;
-			result.advanced = true;
-		}
-		if(advancedIndex >= 0)
-		{
-			commandParts.splice(advancedIndex, 1);
-			result.advanced = true;
-		}
-		if(roteIndex >= 0)
-		{
-			commandParts.splice(roteIndex, 1);
-			result.rote = true;
-		}
-		
+            rote = message.content.match(/rote/),
+			advanced = message.content.match(/advance/);
+
+	    if(rote)
+        {
+            result.rote = true;
+        }
+	    if(advanced)
+        {
+            result.advanced = true;
+        }
+
 		return result;
 	}
 	
@@ -87,10 +71,12 @@ class CoDDiceBot extends DiscordBot
 	
 	preProcess(commandParts, message)
 	{
-		let tricks = this.processRoteAdvanced(commandParts),
+		let tricks = this.processRoteAdvanced(message),
 			critAndExplode = this.processCritExplode(message);
 
-		return Object.assign({}, tricks, critAndExplode);
+		let data = Object.assign({}, tricks, critAndExplode);
+		console.log(data);
+		return data;
 	}
 	
 	getSTRoleNameForGuild(guildId)
@@ -343,15 +329,15 @@ class CoDDiceBot extends DiscordBot
 					'',
 					'Simple actions:',
 					'Command format:',
-					prefix+'roll [r a {8|9|10}-again {exceptionalOn}!] {pool} {sitmods} -- A description of the roll\n',
+					prefix+'roll [rote advanced {8|9|10}-again {exceptionalOn}-exceptional] {pool} {sitmods} -- A description of the roll\n',
 					'\t*'+prefix+'roll 7* would roll 7 dice',
 					'\t*'+prefix+'roll 7 2* would roll 9 dice, treating two of them as a bonus',
 					'\t*'+prefix+'roll 7 -2* would roll 5 dice, treating the minus two as a penalty',
 					'\t*'+prefix+'roll 9-again 5* would roll 5 dice, rerolling all 9s and 10s',
 					'\t*'+prefix+'roll 3-exceptional 6* would roll 6 dice, and would count 3 or more successes as exceptional',
 					'\t*'+prefix+'roll 8-again 4-exceptional 9* would roll 9 dice, rerolling on 8s, 9s or 10s and count 4 or more successes as exceptional',
-					'\t*'+prefix+'roll r 6* would roll 6 dice, with the rote action',
-					'\t*'+prefix+'roll a 8* would roll 8 dice, with the advanced action',
+					'\t*'+prefix+'roll rote 6* would roll 6 dice, with the rote action',
+					'\t*'+prefix+'roll advanced 8* would roll 8 dice, with the advanced action',
 					'',
 					'Extended Actions: ',
 					'Extended actions require {target} successes, 10 by default, over their {pool} rolls with {pool} + {sitmods} dice rolled each time',
