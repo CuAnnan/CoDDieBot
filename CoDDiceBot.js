@@ -1,22 +1,22 @@
-let DiscordBot = require('./DiscordBot'),
+let DiscordBot = require('extensiblediscordbot'),
 	{SimpleAction, AdvancedAction, ExtendedAction} = require('./DiceRoller'),
-	conf = require('./conf'),
 	settingsToHoist = ['stRoleOverrides', 'serverWideOverridePreventDM', 'serverWideOverridesInChannelResponses', 'channelOverrides'];
 
 class CoDDiceBot extends DiscordBot
 {
-	constructor()
+	constructor(conf)
 	{
-		super();
+		super(conf);
+		this.defaultSTRoleName = conf.defaultSTRoleName;
 		this.stRoleOverrides = {};
 		this.serverWideOverridePreventDM = {};
 		this.serverWideOverridesInChannelResponses = {};
 		this.channelOverrides = {};
 	}
 	
-	async hoist(user)
+	async hoist(client)
 	{
-		let settings = await super.hoist(user);
+		let settings = await super.hoist(client);
 		
 		for(let setting of settingsToHoist)
 		{
@@ -85,7 +85,7 @@ class CoDDiceBot extends DiscordBot
 		{
 			return this.stRoleOverrides[guildId];
 		}
-		return conf.stRoleName;
+		return this.defaultSTRoleName;
 	}
 	
 	setSTRoleNameForGuild(commandParts, message)
@@ -100,7 +100,7 @@ class CoDDiceBot extends DiscordBot
 		{
 			return;
 		}
-		if (stRole === conf.stRoleName)
+		if (stRole === this.defaultSTRoleName)
 		{
 			delete this.stRoleOverrides[message.guild.id];
 		}
@@ -357,4 +357,4 @@ class CoDDiceBot extends DiscordBot
 	}
 }
 
-module.exports = new CoDDiceBot();
+module.exports = CoDDiceBot;

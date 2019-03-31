@@ -1,7 +1,8 @@
 const Discord = require('discord.js');
 const client = new Discord.Client();
 const conf = require('./conf.js');
-const bot = require('./CoDDiceBot.js');
+const Bot = require('./CoDDiceBot.js');
+let bot = null;
 
 function listen()
 {
@@ -31,8 +32,9 @@ client.once(
 	function()
 	{
 		console.log("Logged in as "+client.user.username+"!");
+		bot = new Bot(conf);
 		
-		bot.hoist(client.user).then(
+		bot.hoist(client).then(
 			()=>{
 				console.log('Hoisted bot');
 				listen();

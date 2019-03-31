@@ -4,7 +4,8 @@
   "description": "A node powered dice rolling bot for discord for playing Chronicles of Darkness games",
   "main": "app.js",
   "dependencies": {
-    "discord.js": "^11.3.2"
+    "discord.js": "^11.4.2",
+    "extensiblediscordbot": "git+https://github.com/CuAnnan/DiscordBot.git"
   },
   "devDependencies": {},
   "scripts": {
