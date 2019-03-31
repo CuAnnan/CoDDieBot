@@ -2,7 +2,7 @@
   "name": "coddiebot",
   "version": "1.1.0",
   "description": "A node powered dice rolling bot for discord for playing Chronicles of Darkness games",
-  "main": "app.js",
+  "main": "CoDDiceBot.js",
   "dependencies": {
     "discord.js": "^11.4.2",
     "extensiblediscordbot": "git+https://github.com/CuAnnan/DiscordBot.git"

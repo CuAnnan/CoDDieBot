@@ -48,11 +48,15 @@ process.on(
 	function()
 	{
 		console.log('Shutting down bot')
-		bot.shutdown();
-		console.log('Shutting down client');
-		client.destroy();
-		console.log('Shutting down app');
-		process.exit();
+		bot.shutdown().then(
+			()=> {
+				console.log('Shutting down client');
+				client.destroy();
+				console.log('Shutting down app');
+				process.exit();
+			}
+		);
+
 	}
 );
 

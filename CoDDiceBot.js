@@ -68,13 +68,23 @@ class CoDDiceBot extends DiscordBot
 		
 		return data;
 	}
+
+	processPoolAndSitMods(message)
+	{
+		let data = {pool:5, sitMods:0},
+			standAloneNumbers = message.content.match(/\s(\d+)\s/);
+		console.log(data);
+		return data;
+
+	}
 	
 	preProcess(commandParts, message)
 	{
 		let tricks = this.processRoteAdvanced(message),
-			critAndExplode = this.processCritExplode(message);
+			critAndExplode = this.processCritExplode(message),
+			pool = this.processPoolAndSitMods(message);
 
-		let data = Object.assign({}, tricks, critAndExplode);
+		let data = Object.assign({}, tricks, critAndExplode, pool);
 		console.log(data);
 		return data;
 	}
@@ -125,7 +135,7 @@ class CoDDiceBot extends DiscordBot
 			return;
 		}
 		delete this.serverWideOverridePreventDM[message.guild.id];
-		return;
+		return true;
 	}
 	
 	/**
@@ -259,12 +269,6 @@ class CoDDiceBot extends DiscordBot
 		let data = this.preProcess(commandParts, message),
 			roll;
 		
-		data.pool = parseInt(commandParts[0]);
-		if(commandParts.length == 2)
-		{
-			data.sitMods = parseInt(commandParts[1]);
-		}
-		
 		if(data.advanced)
 		{
 			roll = new AdvancedAction(data);
@@ -318,10 +322,10 @@ class CoDDiceBot extends DiscordBot
 		this.attachCommand('allowRollsHere', this.flagChannelForRolling);
 	}
 	
-	displayHelpText(commandParts, message)
+	async displayHelpText(commandParts, message)
 	{
 		let prefix = this.commandPrefix;
-		message.author.createDM().then(
+		return message.author.createDM().then(
 			function(dm)
 			{
 				return dm.send([
