@@ -1,10 +1,12 @@
+'use strict';
+
 function extend(object, data, defaults)
 {
 	object = object?object:{};
 	data = data?data:defaults;
 	if(data !== object)
 	{
-		for (var i in defaults)
+		for (let i in defaults)
 		{
 			if (!data[i] && !object[i])
 			{
@@ -13,7 +15,7 @@ function extend(object, data, defaults)
 		}
 	}
 
-	for(var i in data)
+	for(let i in data)
 	{
 		if(!object[i])
 		{
@@ -39,14 +41,14 @@ function Die(data)
 
 Die.prototype.addExtraDie = function()
 {
-	var otherDie = new Die({explodesOn:this.explodesOn, succeedsOn:this.succeedsOn}).roll();
+	let otherDie = new Die({explodesOn:this.explodesOn, succeedsOn:this.succeedsOn}).roll();
 	this.successes += otherDie.successes;
 	this.results = this.results.concat(otherDie.results);
 };
 
 Die.prototype.roll = function()
 {
-	var result = Math.floor(Math.random() * 10) + 1;
+	let result = Math.floor(Math.random() * 10) + 1;
 	this.results.push(result);
 
 	if(result >= this.succeedsOn)
@@ -99,9 +101,9 @@ Action.prototype.getSuccesses = function()
 
 Action.prototype.rollDice = function()
 {
-	for(var i = 0; i < this.diceToRoll; i++)
+	for(let i = 0; i < this.diceToRoll; i++)
 	{
-		var die = new Die(this).roll();
+		let die = new Die(this).roll();
 		this.successes += die.successes;
 		this.dice.push(die);
 	}
@@ -134,10 +136,10 @@ SimpleAction.prototype.constructor = SimpleAction;
 SimpleAction.prototype.toJSON = function()
 {
 	this.perform();
-	var toEncode = [
+	let toEncode = [
 		'pool', 'sitMods', 'explodesOn', 'succeedsOn', 'exceptionalThreshold', 'rote', 'successes'
 	];
-	var data = {dice:this.getDiceJSON()};
+	let data = {dice:this.getDiceJSON()};
 	for(let value of toEncode)
 	{
 		data[value] = this[value];
@@ -147,7 +149,7 @@ SimpleAction.prototype.toJSON = function()
 
 SimpleAction.prototype.getDiceJSON = function()
 {
-	var dice = [];
+	let dice = [];
 	for(let value of this.dice)
 	{
 		dice.push(value.toJSON());
@@ -158,14 +160,14 @@ SimpleAction.prototype.getDiceJSON = function()
 SimpleAction.prototype.getResults = function()
 {
 	this.perform();
-	var string = 'Successes: '+this.successes;
+	let string = 'Successes: '+this.successes;
 	if(this.successes >= this.exceptionalThreshold)
 	{
 		string += ', Exceptional Success';
 	}
 	string += ', Rolls: (';
-	var rolls = [];
-	for(var i in this.dice)
+	let rolls = [];
+	for(let i in this.dice)
 	{
 		rolls.push(
 			'['+this.dice[i].results.join(', ')+']'
@@ -219,10 +221,10 @@ AdvancedAction.prototype.getResults = function(joinResults)
 AdvancedAction.prototype.toJSON = function()
 {
 	this.perform();
-	var toEncode = [
+	let toEncode = [
 		'pool', 'sitMods', 'explodesOn', 'succeedsOn', 'exceptionalThreshold', 'rote', 'successes'
 	];
-	var data = {
+	let data = {
 		rolls:[
 			this.attempt1.getDiceJSON(),
 			this.attempt2.getDiceJSON()
@@ -273,10 +275,10 @@ ExtendedAction.prototype.constructor = ExtendedAction;
 ExtendedAction.prototype.toJSON = function()
 {
 	this.perform();
-	var toEncode = [
+	let toEncode = [
 		'pool', 'sitMods', 'explodesOn', 'succeedsOn', 'exceptionalThreshold', 'rote', 'successes'
 	];
-	var data = {
+	let data = {
 		rolls:[]
 	}
 	for(let i in this.rolls)
@@ -327,7 +329,7 @@ ExtendedAction.prototype.getSuccesses = function()
 ExtendedAction.prototype.getResults = function()
 {
 	this.perform();
-	var resultTextFields = [
+	let resultTextFields = [
 		'Result:',
 		'Successes: '+this.totalSuccesses +'/'+this.successThreshold
 	];
@@ -336,7 +338,7 @@ ExtendedAction.prototype.getResults = function()
 	{
 		resultTextFields.push('Exceptional successes: '+this.totalExceptionalSuccesses);
 	}
-	for(var i in this.rolls)
+	for(let i in this.rolls)
 	{
 		let results = this.rolls[i].getResults(this.advanced);
 		resultTextFields.push('Roll '+(parseInt(i)+1)+' of '+this.pool);

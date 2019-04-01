@@ -17,16 +17,16 @@ class CoDDiceBot extends DiscordBot
 	async hoist(client)
 	{
 		let settings = await super.hoist(client);
-		
+
 		for(let setting of settingsToHoist)
 		{
 			this[setting] = settings[setting]?settings[setting]:{};
 		}
-		
+
 		this.attachCommands();
 		return settings;
 	}
-	
+
 	processRoteAdvanced(message)
 	{
 	    let result = {
@@ -48,7 +48,7 @@ class CoDDiceBot extends DiscordBot
 
 		return result;
 	}
-	
+
 	processCritExplode(message)
 	{
 		let data = {
@@ -59,21 +59,35 @@ class CoDDiceBot extends DiscordBot
 			exceptional = message.content.match(/(\d)-e/);
 		if(explode && explode.length >= 1)
 		{
-			data.explodeOn = explode[1];
+			data.explodesOn = parseInt(explode[1]);
 		};
 		if(exceptional && exceptional.length >= 1)
 		{
-			data.exceptionalThreshold = exceptional[1];
+			data.exceptionalThreshold = parseInt(exceptional[1]);
 		}
-		
+
 		return data;
 	}
 
-	processPoolAndSitMods(message)
+	processPoolAndSitMods(commandParts)
 	{
-		let data = {pool:5, sitMods:0},
-			standAloneNumbers = message.content.match(/\s(\d+)\s/);
-		console.log(data);
+		let data = {pool:0, sitMods:0};
+		let poolSearch = true;
+		for(let commandPart of commandParts)
+		{
+			if(!isNaN(commandPart))
+			{
+				if(poolSearch)
+				{
+					poolSearch = false;
+					data.pool = parseInt(commandPart);
+				}
+				else
+				{
+					data.sitMods += parseInt(commandPart);
+				}
+			}
+		}
 		return data;
 
 	}
@@ -82,10 +96,9 @@ class CoDDiceBot extends DiscordBot
 	{
 		let tricks = this.processRoteAdvanced(message),
 			critAndExplode = this.processCritExplode(message),
-			pool = this.processPoolAndSitMods(message);
+			pool = this.processPoolAndSitMods(commandParts);
 
 		let data = Object.assign({}, tricks, critAndExplode, pool);
-		console.log(data);
 		return data;
 	}
 	

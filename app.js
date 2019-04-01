@@ -4,28 +4,6 @@ const conf = require('./conf.js');
 const Bot = require('./CoDDiceBot.js');
 let bot = null;
 
-function listen()
-{
-	client.on(
-		'message',
-		function(message)
-		{
-			try
-			{
-				if (message.author.bot)
-				{
-					return;
-				}
-				bot.processCommand(message);
-			}
-			catch(e)
-			{
-				console.warn(e);
-			}
-		}
-	);
-}
-
 client.login(conf.clientToken);
 client.once(
 	'ready',
@@ -37,7 +15,6 @@ client.once(
 		bot.hoist(client).then(
 			()=>{
 				console.log('Hoisted bot');
-				listen();
 			}
 		);
 	}
