@@ -27,6 +27,21 @@ class CoDDiceBot extends DiscordBot
 		return settings;
 	}
 
+	getSimpleAction(data)
+	{
+		return new SimpleAction(data);
+	}
+
+	getAdvancedAction(data)
+	{
+		return new AdvancedAction(data);
+	}
+
+	getExtendedAction(data)
+	{
+		return new ExtendedAction(data);
+	}
+
 	processRoteAdvanced(message)
 	{
 	    let result = {
@@ -284,11 +299,11 @@ class CoDDiceBot extends DiscordBot
 		
 		if(data.advanced)
 		{
-			roll = new AdvancedAction(data);
+			roll = this.getAdvancedAction(data);
 		}
 		else
 		{
-			roll = new SimpleAction(data);
+			roll = this.getSimpleAction(data);
 		}
 		this.displayResults(roll, message, comment);
 	}
@@ -309,7 +324,7 @@ class CoDDiceBot extends DiscordBot
 			}
 		}
 		
-		let action = new ExtendedAction(data);
+		let action = this.getExtendedAction(data);
 		this.displayResults(action, message);
 	}
 	
